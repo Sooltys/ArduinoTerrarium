@@ -42,7 +42,7 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 // zmienne do odliczania millis()
 unsigned long aktualnyCzas = 0;
-unsigned long zapamietanyCzas[] = {-10000, -120000, -1000};
+unsigned long zapamietanyCzas[] = {-10000, -60000, -5000};
 unsigned long roznicaCzasu[] = {0, 0, 0};
 
 // zmienne sieci WiFi
@@ -64,8 +64,10 @@ void setup() {
     pinMode(przyciskMinus, INPUT_PULLUP);
     pinMode(grzalka, OUTPUT);
     pinMode(grzalkaLED, OUTPUT);
+    pinMode(grzalkaMata, OUTPUT);
     digitalWrite(grzalka, HIGH);
     digitalWrite(grzalkaLED, LOW);
+    digitalWrite(grzalkaMata, HIGH);
     pinMode(uploadLED, OUTPUT);
   
     dht.begin();
@@ -88,7 +90,7 @@ void loop() {
     aktualnyCzas = millis();
 
     roznicaCzasu[2] = aktualnyCzas - zapamietanyCzas[2];
-    if (roznicaCzasu[2] >= 1000UL) {
+    if (roznicaCzasu[2] >= 5000UL) {
         zapamietanyCzas[2] = aktualnyCzas;
         wilgotnosc = dht.readHumidity();
         temperatura = dht.readTemperature();
@@ -107,10 +109,12 @@ void loop() {
 
     if(temperaturaUstawiona > temperatura) {
         digitalWrite(grzalka, LOW);
+        digitalWrite(grzalkaMata, LOW);
         digitalWrite(grzalkaLED, HIGH);
     }
     else {
         digitalWrite(grzalka, HIGH);
+        digitalWrite(grzalkaMata, LOW);
         digitalWrite(grzalkaLED, LOW);
     }
 
@@ -119,7 +123,7 @@ void loop() {
     zmianaTemperaturyPrzyciski();
   
     roznicaCzasu[1] = aktualnyCzas - zapamietanyCzas[1];
-    if (roznicaCzasu[1] >= 120000UL) {
+    if (roznicaCzasu[1] >= 60000UL) {
         zapamietanyCzas[1] = aktualnyCzas;
         wyslijDaneNaSerwer();
     }
@@ -281,6 +285,7 @@ void printWifiStatus() {
 }
 
 void connectWiFi() {
+    digitalWrite(uploadLED, HIGH);
     // sprawdzenie WiFi shield
     if (WiFi.status() == WL_NO_SHIELD) {
         Serial.println(F("WiFi shield not present"));
@@ -318,4 +323,6 @@ void connectWiFi() {
   
     delay(2000);
     lcd.clear();
+    
+    digitalWrite(uploadLED, LOW);
 }
