@@ -32,7 +32,7 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 // zmienne do odliczania millis()
 unsigned long aktualnyCzas = 0;
-unsigned long zapamietanyCzas[] = {-10000, -120000, -1000};
+unsigned long zapamietanyCzas[] = {-10000, -60000, -5000};
 unsigned long roznicaCzasu[] = {0, 0, 0};
 
 // zmienne sieci WiFi
@@ -116,7 +116,7 @@ void loop() {
     }
     else {
         digitalWrite(15, 0x1);
-        digitalWrite(16, 0x0);
+        digitalWrite(16, 0x1);
         digitalWrite(14, 0x0);
     }
 

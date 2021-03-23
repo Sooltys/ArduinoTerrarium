@@ -114,7 +114,7 @@ void loop() {
     }
     else {
         digitalWrite(grzalka, HIGH);
-        digitalWrite(grzalkaMata, LOW);
+        digitalWrite(grzalkaMata, HIGH);
         digitalWrite(grzalkaLED, LOW);
     }
 
