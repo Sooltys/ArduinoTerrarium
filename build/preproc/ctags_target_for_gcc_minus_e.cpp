@@ -32,7 +32,7 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 // zmienne do odliczania millis()
 unsigned long aktualnyCzas = 0;
-unsigned long zapamietanyCzas[] = {-10000, -60000, -5000};
+unsigned long zapamietanyCzas[] = {-10000, -100000, -5000};
 unsigned long roznicaCzasu[] = {0, 0, 0};
 
 // zmienne sieci WiFi
@@ -125,7 +125,7 @@ void loop() {
     zmianaTemperaturyPrzyciski();
 
     roznicaCzasu[1] = aktualnyCzas - zapamietanyCzas[1];
-    if (roznicaCzasu[1] >= 60000UL) {
+    if (roznicaCzasu[1] >= 100000UL) {
         zapamietanyCzas[1] = aktualnyCzas;
         wyslijDaneNaSerwer();
     }
