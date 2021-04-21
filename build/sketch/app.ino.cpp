@@ -1,130 +1,139 @@
 #include <Arduino.h>
 #line 1 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+// biblioteka Arduino pozwalająca na komunikację z urządzeniami I2C na porcie SDDA i SCL
 #include <Wire.h>
+// biblioteki do obsługi wyświetlacza LCD z konwerterem I2C
 #include <LiquidCrystal_I2C.h>
-
+// biblioteki do obsługi czujnika temperatury
 #include <DHT.h>
 #include <DHT_U.h>
-
+// biblioteki poptrzebne do osługi nakładi WiFi komunikującego się z mikrokontrolerem za pomocą interfejsu SPI
 #include <SPI.h>
 #include <WiFi.h>
-
+// biblioteka funkcji watchdog 
 #include <avr/wdt.h>
 
-// czujjnik temperatury i wilgoci
+// definiujemy rodzaj czujnika temperatury oraz do którego portu jest podłączony
 #define DHTPIN 2
 #define DHTTYPE DHT11
-
-#define uploadLED 17
+// definiujemy porty
+#define komunikacjaLED 17
 #define przyciskZmianyTrybuLCD 3
 #define przyciskPlus 6
 #define przyciskMinus 5
 #define grzalka 15
 #define grzalkaMata 16
 #define grzalkaLED 14
+// definiujemy wartości temperatur
 #define minimalnaTemperatura 15
 #define maksymalnaTemperatura 40
-#define nominalnaTemperatura 30
+#define nominalnaTemperatura 19
+// definiujemy czasy wykonywania funkcji
+#define nrCzasCzytanie 2
+#define czasCzytanieCzujnik 2000UL
+#define nrCzasPobieranie 0
+#define czasPobieranieTemp 10000UL
+#define nrCzasWysylanie 1
+#define czasWysylanieTemp 60000UL
 
+// wypisujemy zmienne oraz ich wartości początkowe
 int ostatniStanPrzyciskPlus = HIGH;
 int ostatniStanPrzyciskMinus = HIGH;
 int temperaturaUstawiona = nominalnaTemperatura;
-int staraTemperaturaUstawiona = temperaturaUstawiona;
+boolean zmianaTemperatury = false;
 float wilgotnosc;
 float temperatura;
 int trybWyswietlacza = 0;
 boolean zmianaTrybu = false;
 int ostatniStanPrzyciskuZmiany = HIGH;
 
-// inicjalizacja czujnika temp i wilg
-DHT dht(DHTPIN, DHTTYPE);
-
-// inicjalizacja wyświetlacza 
-LiquidCrystal_I2C lcd(0x27, 16, 2);
-
 // zmienne do odliczania millis()
-unsigned long aktualnyCzas = 0;
-unsigned long zapamietanyCzas[] = {-10000, -100000, -5000};
+unsigned long aktualnyCzas = 100000;
+unsigned long zapamietanyCzas[] = {0, 0, 0};
 unsigned long roznicaCzasu[] = {0, 0, 0};
 
 // zmienne sieci WiFi
 char ssid[] = "FunBox2-EF66";       // SSID sieci WiFi
 char pass[] = "NIEMAHASLA";         // haslo sieci WiFi
-//int keyIndex = 0;                   // dla sieci zabezpieczonej WEP
+//int keyIndex = 0;                 // dla sieci zabezpieczonej WEP
 int status = WL_IDLE_STATUS;
 
 // zmienne łączenia z serwerem
-WiFiClient client;
+WiFiClient client; 
 char SERVER[] = "www.pj41491.zut.edu.pl";
 int HTTP_PORT = 80;
 
-#line 59 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
-void setup();
-#line 85 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
-void loop();
-#line 133 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
-void wyswietlDaneNaLCD();
-#line 161 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
-void zmianaTemperaturyPrzyciski();
-#line 181 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
-void odczytajPrzyciskZmiany();
-#line 196 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
-void wyslijDaneNaSerwer();
-#line 222 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
-int pobierzTemperature();
-#line 270 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
-void printWifiStatus();
-#line 287 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
-void connectWiFi();
-#line 59 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
-void setup() {
-    Serial.begin(9600);
+// inicjalizacja czujnika temperatury i wilgotności
+DHT dht(DHTPIN, DHTTYPE); 
 
+// inicjalizacja wyświetlacza 
+LiquidCrystal_I2C lcd(0x27, 16, 2); 
+
+#line 70 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+void setup();
+#line 97 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+void loop();
+#line 146 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+void wyswietlDaneNaLCD();
+#line 183 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+void zmianaTemperaturyPrzyciski();
+#line 203 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+void odczytajPrzyciskZmiany();
+#line 221 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+void wyslijDaneNaSerwer();
+#line 247 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+int pobierzTemperature();
+#line 295 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+void printWifiStatus();
+#line 312 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+void connectWiFi();
+#line 70 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+void setup() {
+    Serial.begin(9600); // szybkość komunikacji szeregowej
+
+    // definicja rodzaju pinów mikrokontrolera
     pinMode(przyciskZmianyTrybuLCD, INPUT_PULLUP);
     pinMode(przyciskPlus, INPUT_PULLUP);
     pinMode(przyciskMinus, INPUT_PULLUP);
     pinMode(grzalka, OUTPUT);
     pinMode(grzalkaLED, OUTPUT);
     pinMode(grzalkaMata, OUTPUT);
+    // przypisanie poczatkowych stanów dla pinów
     digitalWrite(grzalka, HIGH);
     digitalWrite(grzalkaLED, LOW);
     digitalWrite(grzalkaMata, HIGH);
-    pinMode(uploadLED, OUTPUT);
+    pinMode(komunikacjaLED, OUTPUT);
   
-    dht.begin();
+    dht.begin(); // start czujnika temperatury
 
-    lcd.begin();
+    lcd.begin(); // start wyświetlacza z włączeniem podświetlenia
     lcd.backlight();
     lcd.clear();
 
-    connectWiFi();
+    connectWiFi(); // połączenie z siecią WiFi
 
-    // ustawienie watchdog'a
-    wdt_enable(WDTO_8S);
+    wdt_enable(WDTO_8S); // uruchomienie watchdog'a
 }
 
 void loop() {
-    // reset licznika watchdog'a
-    wdt_reset();
-  
-    // wykorzystanie millis() zamiast delay() aby nie zatrzymywać całego mikrokontrolera
-    aktualnyCzas = millis();
+    wdt_reset(); // reset licznika watchdog'a
 
-    roznicaCzasu[2] = aktualnyCzas - zapamietanyCzas[2];
-    if (roznicaCzasu[2] >= 5000UL) {
-        zapamietanyCzas[2] = aktualnyCzas;
+    roznicaCzasu[nrCzasCzytanie] = aktualnyCzas - zapamietanyCzas[nrCzasCzytanie];
+    if (roznicaCzasu[nrCzasCzytanie] >= czasCzytanieCzujnik) {
+        zapamietanyCzas[nrCzasCzytanie] = aktualnyCzas;
         wilgotnosc = dht.readHumidity();
         temperatura = dht.readTemperature();
+        wyswietlDaneNaLCD();
     }
 
-    roznicaCzasu[0] = aktualnyCzas - zapamietanyCzas[0];
-    if (roznicaCzasu[0] >= 10000UL) {
-        zapamietanyCzas[0] = aktualnyCzas;
-        wyswietlDaneNaLCD();
-        if(temperaturaUstawiona == staraTemperaturaUstawiona) {
+    roznicaCzasu[nrCzasPobieranie] = aktualnyCzas - zapamietanyCzas[nrCzasPobieranie];
+    if (roznicaCzasu[nrCzasPobieranie] >= czasPobieranieTemp) {
+        zapamietanyCzas[nrCzasPobieranie] = aktualnyCzas;
+        if(zmianaTemperatury == false && status == WL_CONNECTED) {
             temperaturaUstawiona = pobierzTemperature();
         }
     }
+
     // reset licznika watchdog'a
     wdt_reset();
 
@@ -139,16 +148,20 @@ void loop() {
         digitalWrite(grzalkaLED, LOW);
     }
 
-    odczytajPrzyciskZmiany();
+    odczytajPrzyciskZmiany(); // obsługa przycisku zmiany wyświetlania
 
-    zmianaTemperaturyPrzyciski();
+    zmianaTemperaturyPrzyciski(); // obsługa przyciskó zmiany temperatury
   
-    roznicaCzasu[1] = aktualnyCzas - zapamietanyCzas[1];
-    if (roznicaCzasu[1] >= 100000UL) {
-        zapamietanyCzas[1] = aktualnyCzas;
-        wyslijDaneNaSerwer();
+    roznicaCzasu[nrCzasWysylanie] = aktualnyCzas - zapamietanyCzas[nrCzasWysylanie];
+    if (roznicaCzasu[nrCzasWysylanie] >= czasWysylanieTemp) {
+        zapamietanyCzas[nrCzasWysylanie] = aktualnyCzas;
+        if(status == WL_CONNECTED) {
+            wyslijDaneNaSerwer();
+        }
     }
 
+    // wykorzystanie millis() zamiast delay() aby nie zatrzymywać całego mikrokontrolera
+    aktualnyCzas = millis();
 }
 
 void wyswietlDaneNaLCD() {
@@ -170,6 +183,15 @@ void wyswietlDaneNaLCD() {
             lcd.setCursor(0,0);
             lcd.print("Wilg: "+String(wilgotnosc)+" %RH");
             break;
+        case 2:
+            lcd.setCursor(0,0);
+            lcd.print("Status WiFi");
+            lcd.setCursor(0,1);
+            if(status == WL_CONNECTED)
+                lcd.print("OK");
+            else
+                lcd.print("ERROR");
+            break;
         default: 
             lcd.setCursor(0,0);
             lcd.print("Wilg: "+String(wilgotnosc)+" %RH");
@@ -184,13 +206,13 @@ void zmianaTemperaturyPrzyciski() {
     int zczytanieStanuMinus = digitalRead(przyciskMinus);
     if(zczytanieStanuPlus == LOW && ostatniStanPrzyciskPlus == HIGH) {
         if(trybWyswietlacza == 0 && temperaturaUstawiona < maksymalnaTemperatura) {
-            staraTemperaturaUstawiona = temperaturaUstawiona;
+            zmianaTemperatury = true;
             temperaturaUstawiona++;
         }
     }
     if(zczytanieStanuMinus == LOW && ostatniStanPrzyciskMinus == HIGH) {
         if(trybWyswietlacza == 0 && temperaturaUstawiona > minimalnaTemperatura) {
-            staraTemperaturaUstawiona = temperaturaUstawiona;
+            zmianaTemperatury = true;
             temperaturaUstawiona--;
         }
     }
@@ -205,6 +227,9 @@ void odczytajPrzyciskZmiany() {
         zmianaTrybu = true;
         if(trybWyswietlacza == 0) {
             trybWyswietlacza = 1;
+        }
+        else if(trybWyswietlacza == 1) {
+            trybWyswietlacza = 2;
         }
         else {
             trybWyswietlacza = 0;
@@ -225,15 +250,15 @@ void wyslijDaneNaSerwer() {
         client.println("Host: " + String(SERVER));
         client.println("Connection: close");
         client.println(); // end HTTP header
-        digitalWrite(uploadLED, HIGH);
+        digitalWrite(komunikacjaLED, HIGH);
         while(client.connected()) {
         }
         // the server's disconnected, stop the client:
         client.stop();
-        digitalWrite(uploadLED, LOW);
+        digitalWrite(komunikacjaLED, LOW);
         Serial.println();
         Serial.println("disconnected");
-        staraTemperaturaUstawiona = temperaturaUstawiona;
+        zmianaTemperatury = false;
     } 
     else { // if not connected:
         Serial.println("connection failed");
@@ -253,7 +278,7 @@ int pobierzTemperature() {
 
         boolean czytanie = false;
         String str = "";
-        digitalWrite(uploadLED, HIGH);
+        digitalWrite(komunikacjaLED, HIGH);
         while(client.connected()) {
             while(client.available()){
                 char c = client.read();
@@ -277,7 +302,7 @@ int pobierzTemperature() {
         //Serial.println(str);
         //Serial.println(liczba);
         client.stop();
-        digitalWrite(uploadLED, LOW);
+        digitalWrite(komunikacjaLED, LOW);
         Serial.println();
         Serial.println("disconnected");
     } 
@@ -306,11 +331,12 @@ void printWifiStatus() {
 }
 
 void connectWiFi() {
-    digitalWrite(uploadLED, HIGH);
+    int proba = 0;
+    digitalWrite(komunikacjaLED, HIGH);
     // sprawdzenie WiFi shield
     if (WiFi.status() == WL_NO_SHIELD) {
         Serial.println(F("WiFi shield not present"));
-        // don't continue:
+        // zawieszenie programu
         while (true);
     }
     String fv = WiFi.firmwareVersion();
@@ -318,7 +344,8 @@ void connectWiFi() {
         Serial.println(F("Please upgrade the firmware"));
     }
     // próba łączenia z siecią WiFi
-    while (status != WL_CONNECTED) {
+    while (status != WL_CONNECTED && proba == 0) {
+        proba = 1;
         Serial.print(F("Attempting to connect to SSID: "));
         Serial.println(ssid);
     
@@ -333,19 +360,18 @@ void connectWiFi() {
         delay(2000);
     }
 
-    // you're connected now, so print out the status:
-    printWifiStatus();
-
-    lcd.clear();
-    lcd.setCursor(0,0);
-    lcd.print(F("Connect OK"));
-    lcd.setCursor(0,1);
-    lcd.print(WiFi.localIP());
-  
-    delay(2000);
-    lcd.clear();
+    if(status == WL_CONNECTED) {
+        printWifiStatus();
+        lcd.clear();
+        lcd.setCursor(0,0);
+        lcd.print(F("Connect OK"));
+        lcd.setCursor(0,1);
+        lcd.print(WiFi.localIP());
+        delay(2000);
+        lcd.clear();
+    }
     
-    digitalWrite(uploadLED, LOW);
+    digitalWrite(komunikacjaLED, LOW);
 }
 #line 1 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\test.ino"
 
