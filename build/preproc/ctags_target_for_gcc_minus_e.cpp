@@ -1,6 +1,6 @@
 # 1 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
-// biblioteka Arduino pozwalająca na komunikację z urządzeniami I2C na porcie SDDA i SCL
-# 3 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 2
+// biblioteka Arduino pozwalająca na komunikację z urządzeniami I2C na porcie SDA i SCL
+
 // biblioteki do obsługi wyświetlacza LCD z konwerterem I2C
 # 5 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 2
 // biblioteki do obsługi czujnika temperatury
@@ -78,13 +78,14 @@ void setup() {
     pinMode(6, 0x2);
     pinMode(5, 0x2);
     pinMode(15, 0x1);
-    pinMode(14, 0x1);
     pinMode(16, 0x1);
+    pinMode(14, 0x1);
+    pinMode(17, 0x1);
     // przypisanie poczatkowych stanów dla pinów
     digitalWrite(15, 0x1);
-    digitalWrite(14, 0x0);
     digitalWrite(16, 0x1);
-    pinMode(17, 0x1);
+    digitalWrite(14, 0x0);
+    digitalWrite(17, 0x0);
 
     dht.begin(); // start czujnika temperatury
 
@@ -95,17 +96,17 @@ void setup() {
     connectWiFi(); // połączenie z siecią WiFi
 
     wdt_enable(
-# 94 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
+# 95 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
               9
-# 94 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+# 95 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
                      ); // uruchomienie watchdog'a
 }
 
 void loop() {
     
-# 98 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
+# 99 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
    __asm__ __volatile__ ("wdr")
-# 98 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+# 99 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
               ; // reset licznika watchdog'a
 
     roznicaCzasu[2] = aktualnyCzas - zapamietanyCzas[2];
@@ -117,7 +118,7 @@ void loop() {
     }
 
     roznicaCzasu[0] = aktualnyCzas - zapamietanyCzas[0];
-    if (roznicaCzasu[0] >= 10000UL) {
+    if (roznicaCzasu[0] >= 20000UL) {
         zapamietanyCzas[0] = aktualnyCzas;
         if(zmianaTemperatury == false && status == WL_CONNECTED) {
             temperaturaUstawiona = pobierzTemperature();
@@ -126,21 +127,12 @@ void loop() {
 
     // reset licznika watchdog'a
     
-# 117 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
+# 118 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
    __asm__ __volatile__ ("wdr")
-# 117 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+# 118 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
               ;
 
-    if(temperaturaUstawiona > temperatura) {
-        digitalWrite(15, 0x0);
-        digitalWrite(16, 0x0);
-        digitalWrite(14, 0x1);
-    }
-    else {
-        digitalWrite(15, 0x1);
-        digitalWrite(16, 0x1);
-        digitalWrite(14, 0x0);
-    }
+    sterowanieTemperatura(); // algorytm sterowania temperatura
 
     odczytajPrzyciskZmiany(); // obsługa przycisku zmiany wyświetlania
 
@@ -156,6 +148,19 @@ void loop() {
 
     // wykorzystanie millis() zamiast delay() aby nie zatrzymywać całego mikrokontrolera
     aktualnyCzas = millis();
+}
+
+void sterowanieTemperatura() {
+    if(temperaturaUstawiona > temperatura) {
+        digitalWrite(15, 0x0);
+        digitalWrite(16, 0x0);
+        digitalWrite(14, 0x1);
+    }
+    else {
+        digitalWrite(15, 0x1);
+        digitalWrite(16, 0x1);
+        digitalWrite(14, 0x0);
+    }
 }
 
 void wyswietlDaneNaLCD() {
@@ -234,6 +239,7 @@ void odczytajPrzyciskZmiany() {
 }
 
 void wyslijDaneNaSerwer() {
+    digitalWrite(17, 0x1);
     String queryString = String("/index.php?temperatura=") + String(temperatura) + String("&wilgotnosc=") + String(wilgotnosc) + String("&ustawiona=") + String(temperaturaUstawiona);
     //Serial.println(queryString);
     Serial.println("\nStarting connection to server...");
@@ -244,12 +250,10 @@ void wyslijDaneNaSerwer() {
         client.println("Host: " + String(SERVER));
         client.println("Connection: close");
         client.println(); // end HTTP header
-        digitalWrite(17, 0x1);
         while(client.connected()) {
         }
         // the server's disconnected, stop the client:
         client.stop();
-        digitalWrite(17, 0x0);
         Serial.println();
         Serial.println("disconnected");
         zmianaTemperatury = false;
@@ -257,9 +261,11 @@ void wyslijDaneNaSerwer() {
     else { // if not connected:
         Serial.println("connection failed");
     }
+    digitalWrite(17, 0x0);
 }
 
 int pobierzTemperature() {
+    digitalWrite(17, 0x1);
     int liczba = temperaturaUstawiona;
     String queryString = String("/getValue.php");
     Serial.println("\nStarting connection to server...");
@@ -272,7 +278,6 @@ int pobierzTemperature() {
 
         boolean czytanie = false;
         String str = "";
-        digitalWrite(17, 0x1);
         while(client.connected()) {
             while(client.available()){
                 char c = client.read();
@@ -296,13 +301,13 @@ int pobierzTemperature() {
         //Serial.println(str);
         //Serial.println(liczba);
         client.stop();
-        digitalWrite(17, 0x0);
         Serial.println();
         Serial.println("disconnected");
     }
     else {
         Serial.println("connection failed");
     }
+    digitalWrite(17, 0x0);
 
     return liczba;
 }
@@ -330,13 +335,13 @@ void connectWiFi() {
     // sprawdzenie WiFi shield
     if (WiFi.status() == WL_NO_SHIELD) {
         Serial.println((reinterpret_cast<const __FlashStringHelper *>(
-# 317 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
+# 322 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
                       (__extension__({static const char __c[] __attribute__((__progmem__)) = (
-# 317 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+# 322 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
                       "WiFi shield not present"
-# 317 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
+# 322 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
                       ); &__c[0];}))
-# 317 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+# 322 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
                       )));
         // zawieszenie programu
         while (true);
@@ -344,48 +349,48 @@ void connectWiFi() {
     String fv = WiFi.firmwareVersion();
     if (fv != "1.1.0") {
         Serial.println((reinterpret_cast<const __FlashStringHelper *>(
-# 323 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
+# 328 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
                       (__extension__({static const char __c[] __attribute__((__progmem__)) = (
-# 323 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+# 328 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
                       "Please upgrade the firmware"
-# 323 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
+# 328 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
                       ); &__c[0];}))
-# 323 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+# 328 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
                       )));
     }
     // próba łączenia z siecią WiFi
     while (status != WL_CONNECTED && proba == 0) {
         proba = 1;
         Serial.print((reinterpret_cast<const __FlashStringHelper *>(
-# 328 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
+# 333 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
                     (__extension__({static const char __c[] __attribute__((__progmem__)) = (
-# 328 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+# 333 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
                     "Attempting to connect to SSID: "
-# 328 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
+# 333 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
                     ); &__c[0];}))
-# 328 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+# 333 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
                     )));
         Serial.println(ssid);
 
         lcd.setCursor(0,0);
         lcd.print((reinterpret_cast<const __FlashStringHelper *>(
-# 332 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
+# 337 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
                  (__extension__({static const char __c[] __attribute__((__progmem__)) = (
-# 332 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+# 337 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
                  "Connecting to"
-# 332 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
+# 337 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
                  ); &__c[0];}))
-# 332 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+# 337 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
                  )));
         lcd.setCursor(0,1);
         lcd.print((reinterpret_cast<const __FlashStringHelper *>(
-# 334 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
+# 339 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
                  (__extension__({static const char __c[] __attribute__((__progmem__)) = (
-# 334 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+# 339 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
                  "WiFi..."
-# 334 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
+# 339 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
                  ); &__c[0];}))
-# 334 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+# 339 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
                  )));
 
         // Connect to WPA/WPA2 network. Change this line if using open or WEP network:
@@ -399,13 +404,13 @@ void connectWiFi() {
         lcd.clear();
         lcd.setCursor(0,0);
         lcd.print((reinterpret_cast<const __FlashStringHelper *>(
-# 346 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
+# 351 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
                  (__extension__({static const char __c[] __attribute__((__progmem__)) = (
-# 346 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+# 351 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
                  "Connect OK"
-# 346 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
+# 351 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
                  ); &__c[0];}))
-# 346 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+# 351 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
                  )));
         lcd.setCursor(0,1);
         lcd.print(WiFi.localIP());

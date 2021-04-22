@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #line 1 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
-// biblioteka Arduino pozwalająca na komunikację z urządzeniami I2C na porcie SDDA i SCL
-#include <Wire.h>
+// biblioteka Arduino pozwalająca na komunikację z urządzeniami I2C na porcie SDA i SCL
+
 // biblioteki do obsługi wyświetlacza LCD z konwerterem I2C
 #include <LiquidCrystal_I2C.h>
 // biblioteki do obsługi czujnika temperatury
@@ -32,7 +32,7 @@
 #define nrCzasCzytanie 2
 #define czasCzytanieCzujnik 2000UL
 #define nrCzasPobieranie 0
-#define czasPobieranieTemp 10000UL
+#define czasPobieranieTemp 20000UL
 #define nrCzasWysylanie 1
 #define czasWysylanieTemp 60000UL
 
@@ -71,21 +71,23 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 #line 70 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
 void setup();
-#line 97 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+#line 98 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
 void loop();
-#line 146 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+#line 138 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+void sterowanieTemperatura();
+#line 151 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
 void wyswietlDaneNaLCD();
-#line 183 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+#line 188 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
 void zmianaTemperaturyPrzyciski();
-#line 203 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+#line 208 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
 void odczytajPrzyciskZmiany();
-#line 221 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+#line 226 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
 void wyslijDaneNaSerwer();
-#line 247 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+#line 252 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
 int pobierzTemperature();
-#line 295 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+#line 300 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
 void printWifiStatus();
-#line 312 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+#line 317 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
 void connectWiFi();
 #line 70 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
 void setup() {
@@ -96,13 +98,14 @@ void setup() {
     pinMode(przyciskPlus, INPUT_PULLUP);
     pinMode(przyciskMinus, INPUT_PULLUP);
     pinMode(grzalka, OUTPUT);
-    pinMode(grzalkaLED, OUTPUT);
     pinMode(grzalkaMata, OUTPUT);
+    pinMode(grzalkaLED, OUTPUT);
+    pinMode(komunikacjaLED, OUTPUT);
     // przypisanie poczatkowych stanów dla pinów
     digitalWrite(grzalka, HIGH);
-    digitalWrite(grzalkaLED, LOW);
     digitalWrite(grzalkaMata, HIGH);
-    pinMode(komunikacjaLED, OUTPUT);
+    digitalWrite(grzalkaLED, LOW);
+    digitalWrite(komunikacjaLED, LOW);
   
     dht.begin(); // start czujnika temperatury
 
@@ -137,16 +140,7 @@ void loop() {
     // reset licznika watchdog'a
     wdt_reset();
 
-    if(temperaturaUstawiona > temperatura) {
-        digitalWrite(grzalka, LOW);
-        digitalWrite(grzalkaMata, LOW);
-        digitalWrite(grzalkaLED, HIGH);
-    }
-    else {
-        digitalWrite(grzalka, HIGH);
-        digitalWrite(grzalkaMata, HIGH);
-        digitalWrite(grzalkaLED, LOW);
-    }
+    sterowanieTemperatura(); // algorytm sterowania temperatura
 
     odczytajPrzyciskZmiany(); // obsługa przycisku zmiany wyświetlania
 
@@ -162,6 +156,19 @@ void loop() {
 
     // wykorzystanie millis() zamiast delay() aby nie zatrzymywać całego mikrokontrolera
     aktualnyCzas = millis();
+}
+
+void sterowanieTemperatura() {
+    if(temperaturaUstawiona > temperatura) {
+        digitalWrite(grzalka, LOW);
+        digitalWrite(grzalkaMata, LOW);
+        digitalWrite(grzalkaLED, HIGH);
+    }
+    else {
+        digitalWrite(grzalka, HIGH);
+        digitalWrite(grzalkaMata, HIGH);
+        digitalWrite(grzalkaLED, LOW);
+    }
 }
 
 void wyswietlDaneNaLCD() {
@@ -240,6 +247,7 @@ void odczytajPrzyciskZmiany() {
 }
 
 void wyslijDaneNaSerwer() {
+    digitalWrite(komunikacjaLED, HIGH);
     String queryString = String("/index.php?temperatura=") + String(temperatura) + String("&wilgotnosc=") + String(wilgotnosc) + String("&ustawiona=") + String(temperaturaUstawiona);
     //Serial.println(queryString);
     Serial.println("\nStarting connection to server...");
@@ -250,12 +258,10 @@ void wyslijDaneNaSerwer() {
         client.println("Host: " + String(SERVER));
         client.println("Connection: close");
         client.println(); // end HTTP header
-        digitalWrite(komunikacjaLED, HIGH);
         while(client.connected()) {
         }
         // the server's disconnected, stop the client:
         client.stop();
-        digitalWrite(komunikacjaLED, LOW);
         Serial.println();
         Serial.println("disconnected");
         zmianaTemperatury = false;
@@ -263,9 +269,11 @@ void wyslijDaneNaSerwer() {
     else { // if not connected:
         Serial.println("connection failed");
     }
+    digitalWrite(komunikacjaLED, LOW);
 }
 
 int pobierzTemperature() {
+    digitalWrite(komunikacjaLED, HIGH);
     int liczba = temperaturaUstawiona;
     String queryString = String("/getValue.php");
     Serial.println("\nStarting connection to server...");
@@ -278,7 +286,6 @@ int pobierzTemperature() {
 
         boolean czytanie = false;
         String str = "";
-        digitalWrite(komunikacjaLED, HIGH);
         while(client.connected()) {
             while(client.available()){
                 char c = client.read();
@@ -302,13 +309,13 @@ int pobierzTemperature() {
         //Serial.println(str);
         //Serial.println(liczba);
         client.stop();
-        digitalWrite(komunikacjaLED, LOW);
         Serial.println();
         Serial.println("disconnected");
     } 
     else { 
         Serial.println("connection failed");
     }
+    digitalWrite(komunikacjaLED, LOW);
 
     return liczba;
 }
