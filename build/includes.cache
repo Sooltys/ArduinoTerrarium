@@ -11,6 +11,11 @@
   },
   {
     "Sourcefile": "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\build\\sketch\\app.ino.cpp",
+    "Include": "Wire.h",
+    "Includepath": "C:\\Users\\Kuba\\Desktop\\arduino-1.8.10\\hardware\\arduino\\avr\\libraries\\Wire\\src"
+  },
+  {
+    "Sourcefile": "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\build\\sketch\\app.ino.cpp",
     "Include": "LiquidCrystal_I2C.h",
     "Includepath": "C:\\Users\\Kuba\\Documents\\Arduino\\libraries\\LiquidCrystal_I2C"
   },
@@ -40,9 +45,14 @@
     "Includepath": null
   },
   {
-    "Sourcefile": "C:\\Users\\Kuba\\Documents\\Arduino\\libraries\\LiquidCrystal_I2C\\LiquidCrystal_I2C.cpp",
-    "Include": "Wire.h",
-    "Includepath": "C:\\Users\\Kuba\\Desktop\\arduino-1.8.10\\hardware\\arduino\\avr\\libraries\\Wire\\src"
+    "Sourcefile": "C:\\Users\\Kuba\\Desktop\\arduino-1.8.10\\hardware\\arduino\\avr\\libraries\\Wire\\src\\Wire.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\Kuba\\Desktop\\arduino-1.8.10\\hardware\\arduino\\avr\\libraries\\Wire\\src\\utility\\twi.c",
+    "Include": "",
+    "Includepath": null
   },
   {
     "Sourcefile": "C:\\Users\\Kuba\\Documents\\Arduino\\libraries\\LiquidCrystal_I2C\\LiquidCrystal_I2C.cpp",
@@ -101,16 +111,6 @@
   },
   {
     "Sourcefile": "C:\\Users\\Kuba\\Desktop\\arduino-1.8.10\\libraries\\WiFi\\src\\utility\\wifi_drv.cpp",
-    "Include": "",
-    "Includepath": null
-  },
-  {
-    "Sourcefile": "C:\\Users\\Kuba\\Desktop\\arduino-1.8.10\\hardware\\arduino\\avr\\libraries\\Wire\\src\\Wire.cpp",
-    "Include": "",
-    "Includepath": null
-  },
-  {
-    "Sourcefile": "C:\\Users\\Kuba\\Desktop\\arduino-1.8.10\\hardware\\arduino\\avr\\libraries\\Wire\\src\\utility\\twi.c",
     "Include": "",
     "Includepath": null
   }

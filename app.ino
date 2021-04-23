@@ -155,6 +155,7 @@ void wyswietlDaneNaLCD() {
     }
     switch(trybWyswietlacza) {
         case 0:
+            lcd.backlight();
             lcd.setCursor(0,0);
             lcd.print("Temp: "+String(temperatura)+" "+char(223)+"C");
             lcd.setCursor(0,1);
@@ -175,6 +176,13 @@ void wyswietlDaneNaLCD() {
                 lcd.print("OK");
             else
                 lcd.print("ERROR");
+            break;
+        case 3:
+            lcd.noBacklight();
+            lcd.setCursor(0,0);
+            lcd.print("Temp: "+String(temperatura)+" "+char(223)+"C");
+            lcd.setCursor(0,1);
+            lcd.print("Zadana: "+String(temperaturaUstawiona)+" "+char(223)+"C");
             break;
         default: 
             lcd.setCursor(0,0);
@@ -214,6 +222,9 @@ void odczytajPrzyciskZmiany() {
         }
         else if(trybWyswietlacza == 1) {
             trybWyswietlacza = 2;
+        }
+        else if(trybWyswietlacza == 2) {
+            trybWyswietlacza = 3;
         }
         else {
             trybWyswietlacza = 0;

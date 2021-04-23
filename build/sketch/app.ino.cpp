@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #line 1 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
 // biblioteka Arduino pozwalająca na komunikację z urządzeniami I2C na porcie SDA i SCL
-
+#include <Wire.h>
 // biblioteki do obsługi wyświetlacza LCD z konwerterem I2C
 #include <LiquidCrystal_I2C.h>
 // biblioteki do obsługi czujnika temperatury
@@ -77,17 +77,17 @@ void loop();
 void sterowanieTemperatura();
 #line 151 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
 void wyswietlDaneNaLCD();
-#line 188 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+#line 196 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
 void zmianaTemperaturyPrzyciski();
-#line 208 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+#line 216 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
 void odczytajPrzyciskZmiany();
-#line 226 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+#line 237 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
 void wyslijDaneNaSerwer();
-#line 252 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+#line 263 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
 int pobierzTemperature();
-#line 300 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+#line 311 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
 void printWifiStatus();
-#line 317 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+#line 328 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
 void connectWiFi();
 #line 70 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
 void setup() {
@@ -178,6 +178,7 @@ void wyswietlDaneNaLCD() {
     }
     switch(trybWyswietlacza) {
         case 0:
+            lcd.backlight();
             lcd.setCursor(0,0);
             lcd.print("Temp: "+String(temperatura)+" "+char(223)+"C");
             lcd.setCursor(0,1);
@@ -198,6 +199,13 @@ void wyswietlDaneNaLCD() {
                 lcd.print("OK");
             else
                 lcd.print("ERROR");
+            break;
+        case 3:
+            lcd.noBacklight();
+            lcd.setCursor(0,0);
+            lcd.print("Temp: "+String(temperatura)+" "+char(223)+"C");
+            lcd.setCursor(0,1);
+            lcd.print("Zadana: "+String(temperaturaUstawiona)+" "+char(223)+"C");
             break;
         default: 
             lcd.setCursor(0,0);
@@ -237,6 +245,9 @@ void odczytajPrzyciskZmiany() {
         }
         else if(trybWyswietlacza == 1) {
             trybWyswietlacza = 2;
+        }
+        else if(trybWyswietlacza == 2) {
+            trybWyswietlacza = 3;
         }
         else {
             trybWyswietlacza = 0;

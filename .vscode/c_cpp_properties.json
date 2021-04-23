@@ -39,12 +39,12 @@
             "includePath": [
                 "C:\\Users\\Kuba\\Desktop\\arduino-1.8.10\\hardware\\arduino\\avr\\cores\\arduino",
                 "C:\\Users\\Kuba\\Desktop\\arduino-1.8.10\\hardware\\arduino\\avr\\variants\\standard",
+                "C:\\Users\\Kuba\\Desktop\\arduino-1.8.10\\hardware\\arduino\\avr\\libraries\\Wire\\src",
                 "C:\\Users\\Kuba\\Documents\\Arduino\\libraries\\LiquidCrystal_I2C",
                 "C:\\Users\\Kuba\\Documents\\Arduino\\libraries\\DHT_sensor_library",
                 "C:\\Users\\Kuba\\Documents\\Arduino\\libraries\\Adafruit_Unified_Sensor",
                 "C:\\Users\\Kuba\\Desktop\\arduino-1.8.10\\hardware\\arduino\\avr\\libraries\\SPI\\src",
                 "C:\\Users\\Kuba\\Desktop\\arduino-1.8.10\\libraries\\WiFi\\src",
-                "C:\\Users\\Kuba\\Desktop\\arduino-1.8.10\\hardware\\arduino\\avr\\libraries\\Wire\\src",
                 "c:\\users\\kuba\\desktop\\arduino-1.8.10\\hardware\\tools\\avr\\lib\\gcc\\avr\\7.3.0\\include",
                 "c:\\users\\kuba\\desktop\\arduino-1.8.10\\hardware\\tools\\avr\\lib\\gcc\\avr\\7.3.0\\include-fixed",
                 "c:\\users\\kuba\\desktop\\arduino-1.8.10\\hardware\\tools\\avr\\avr\\include"
