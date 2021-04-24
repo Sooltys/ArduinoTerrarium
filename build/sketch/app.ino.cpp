@@ -83,11 +83,11 @@ void zmianaTemperaturyPrzyciski();
 void odczytajPrzyciskZmiany();
 #line 237 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
 void wyslijDaneNaSerwer();
-#line 263 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+#line 262 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
 int pobierzTemperature();
-#line 311 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+#line 310 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
 void printWifiStatus();
-#line 328 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+#line 327 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
 void connectWiFi();
 #line 70 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
 void setup() {
@@ -269,8 +269,7 @@ void wyslijDaneNaSerwer() {
         client.println("Host: " + String(SERVER));
         client.println("Connection: close");
         client.println(); // end HTTP header
-        while(client.connected()) {
-        }
+        while(client.connected()) { }
         // the server's disconnected, stop the client:
         client.stop();
         Serial.println();

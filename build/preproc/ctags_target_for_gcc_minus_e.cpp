@@ -261,8 +261,7 @@ void wyslijDaneNaSerwer() {
         client.println("Host: " + String(SERVER));
         client.println("Connection: close");
         client.println(); // end HTTP header
-        while(client.connected()) {
-        }
+        while(client.connected()) { }
         // the server's disconnected, stop the client:
         client.stop();
         Serial.println();
@@ -346,13 +345,13 @@ void connectWiFi() {
     // sprawdzenie WiFi shield
     if (WiFi.status() == WL_NO_SHIELD) {
         Serial.println((reinterpret_cast<const __FlashStringHelper *>(
-# 333 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
+# 332 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
                       (__extension__({static const char __c[] __attribute__((__progmem__)) = (
-# 333 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+# 332 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
                       "WiFi shield not present"
-# 333 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
+# 332 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
                       ); &__c[0];}))
-# 333 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+# 332 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
                       )));
         // zawieszenie programu
         while (true);
@@ -360,48 +359,48 @@ void connectWiFi() {
     String fv = WiFi.firmwareVersion();
     if (fv != "1.1.0") {
         Serial.println((reinterpret_cast<const __FlashStringHelper *>(
-# 339 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
+# 338 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
                       (__extension__({static const char __c[] __attribute__((__progmem__)) = (
-# 339 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+# 338 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
                       "Please upgrade the firmware"
-# 339 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
+# 338 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
                       ); &__c[0];}))
-# 339 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+# 338 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
                       )));
     }
     // próba łączenia z siecią WiFi
     while (status != WL_CONNECTED && proba == 0) {
         proba = 1;
         Serial.print((reinterpret_cast<const __FlashStringHelper *>(
-# 344 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
+# 343 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
                     (__extension__({static const char __c[] __attribute__((__progmem__)) = (
-# 344 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+# 343 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
                     "Attempting to connect to SSID: "
-# 344 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
+# 343 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
                     ); &__c[0];}))
-# 344 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+# 343 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
                     )));
         Serial.println(ssid);
 
         lcd.setCursor(0,0);
         lcd.print((reinterpret_cast<const __FlashStringHelper *>(
-# 348 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
+# 347 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
                  (__extension__({static const char __c[] __attribute__((__progmem__)) = (
-# 348 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+# 347 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
                  "Connecting to"
-# 348 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
+# 347 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
                  ); &__c[0];}))
-# 348 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+# 347 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
                  )));
         lcd.setCursor(0,1);
         lcd.print((reinterpret_cast<const __FlashStringHelper *>(
-# 350 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
+# 349 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
                  (__extension__({static const char __c[] __attribute__((__progmem__)) = (
-# 350 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+# 349 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
                  "WiFi..."
-# 350 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
+# 349 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
                  ); &__c[0];}))
-# 350 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+# 349 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
                  )));
 
         // Connect to WPA/WPA2 network. Change this line if using open or WEP network:
@@ -415,13 +414,13 @@ void connectWiFi() {
         lcd.clear();
         lcd.setCursor(0,0);
         lcd.print((reinterpret_cast<const __FlashStringHelper *>(
-# 362 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
+# 361 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
                  (__extension__({static const char __c[] __attribute__((__progmem__)) = (
-# 362 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+# 361 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
                  "Connect OK"
-# 362 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
+# 361 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino" 3
                  ); &__c[0];}))
-# 362 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+# 361 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
                  )));
         lcd.setCursor(0,1);
         lcd.print(WiFi.localIP());

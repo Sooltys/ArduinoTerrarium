@@ -246,8 +246,7 @@ void wyslijDaneNaSerwer() {
         client.println("Host: " + String(SERVER));
         client.println("Connection: close");
         client.println(); // end HTTP header
-        while(client.connected()) {
-        }
+        while(client.connected()) { }
         // the server's disconnected, stop the client:
         client.stop();
         Serial.println();
