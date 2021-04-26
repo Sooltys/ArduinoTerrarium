@@ -52,9 +52,17 @@ unsigned long aktualnyCzas = 100000;
 unsigned long zapamietanyCzas[] = {0, 0, 0};
 unsigned long roznicaCzasu[] = {0, 0, 0};
 
+// zmienne logiky rozmytej
+unsigned long czasPrzyrostu = 0;
+float przyrost = 0.0;
+float ostatniaTemperatura = 0.0; 
+unsigned long ponowneWprowadzenie = 0.0;
+
 // zmienne sieci WiFi
-char ssid[] = "FunBox2-EF66";       // SSID sieci WiFi
-char pass[] = "NIEMAHASLA";         // haslo sieci WiFi
+//char ssid[] = "FunBox2-EF66";       // SSID sieci WiFi
+//char pass[] = "NIEMAHASLA";         // haslo sieci WiFi
+char ssid[] = "iPhone (Jakub)";       // SSID sieci WiFi
+char pass[] = "qwerty123";          // haslo sieci WiFi
 //int keyIndex = 0;                 // dla sieci zabezpieczonej WEP
 int status = WL_IDLE_STATUS;
 
@@ -69,27 +77,29 @@ DHT dht(DHTPIN, DHTTYPE);
 // inicjalizacja wyświetlacza 
 LiquidCrystal_I2C lcd(0x27, 16, 2); 
 
-#line 70 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+#line 78 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
 void setup();
-#line 98 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+#line 106 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
 void loop();
-#line 138 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
-void sterowanieTemperatura();
-#line 151 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+#line 147 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+void sterowanieTemperatury();
+#line 160 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+void sterowanieTemperaturyRozmyte();
+#line 238 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
 void wyswietlDaneNaLCD();
-#line 196 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+#line 283 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
 void zmianaTemperaturyPrzyciski();
-#line 216 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+#line 303 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
 void odczytajPrzyciskZmiany();
-#line 237 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+#line 324 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
 void wyslijDaneNaSerwer();
-#line 262 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+#line 349 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
 int pobierzTemperature();
-#line 310 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+#line 397 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
 void printWifiStatus();
-#line 327 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+#line 414 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
 void connectWiFi();
-#line 70 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
+#line 78 "c:\\Users\\Kuba\\Desktop\\Praca dyplomowa\\ArduinoTerrarium\\app.ino"
 void setup() {
     Serial.begin(9600); // szybkość komunikacji szeregowej
 
@@ -140,8 +150,6 @@ void loop() {
     // reset licznika watchdog'a
     wdt_reset();
 
-    sterowanieTemperatura(); // algorytm sterowania temperatura
-
     odczytajPrzyciskZmiany(); // obsługa przycisku zmiany wyświetlania
 
     zmianaTemperaturyPrzyciski(); // obsługa przyciskó zmiany temperatury
@@ -156,9 +164,12 @@ void loop() {
 
     // wykorzystanie millis() zamiast delay() aby nie zatrzymywać całego mikrokontrolera
     aktualnyCzas = millis();
+    
+    //sterowanieTemperatury(); // algorytm sterowania temperatura
+    sterowanieTemperaturyRozmyte();
 }
 
-void sterowanieTemperatura() {
+void sterowanieTemperatury() {
     if(temperaturaUstawiona > temperatura) {
         digitalWrite(grzalka, LOW);
         digitalWrite(grzalkaMata, LOW);
@@ -168,6 +179,84 @@ void sterowanieTemperatura() {
         digitalWrite(grzalka, HIGH);
         digitalWrite(grzalkaMata, HIGH);
         digitalWrite(grzalkaLED, LOW);
+    }
+}
+
+void sterowanieTemperaturyRozmyte() {
+    // wyliczanie przyrostu co 15 sekund
+    unsigned long roznicaCzasuPrzyrostu = aktualnyCzas - czasPrzyrostu;
+    if(roznicaCzasuPrzyrostu >= 15000UL) {
+        czasPrzyrostu = aktualnyCzas;
+        przyrost = temperatura - ostatniaTemperatura;
+        ostatniaTemperatura = temperatura;
+    }
+    
+    int fuzzyTemperatura; //niska-0, lekko niska-1, prawie osiagnieta-2, osiagnieta-3, wysoka-4
+    int fuzzyPrzyrost; // maly-0, duzy-1
+    if(przyrost >= 0.15) {
+        fuzzyPrzyrost = 1;
+    }else {
+        fuzzyPrzyrost = 0;
+    }
+    if(((temperaturaUstawiona*1.0) - temperatura) >= 3) {
+        fuzzyTemperatura = 0;
+    }else if(((temperaturaUstawiona*1.0) - temperatura) >= 0.9) {
+        fuzzyTemperatura = 1;
+    }else if(((temperaturaUstawiona*1.0) - temperatura) >= 0.2) {
+        fuzzyTemperatura = 2;
+    }else if(((temperaturaUstawiona*1.0) - temperatura) >= -0.2) {
+        fuzzyTemperatura = 3;
+    }else {
+        fuzzyTemperatura = 4;
+    }
+
+    boolean grzanie = false;
+    unsigned long czasGrzania = 0UL;
+    if(fuzzyTemperatura == 0 &&  fuzzyPrzyrost == 0) {
+        grzanie = true; 
+        czasGrzania = 30000UL;
+    }else if(fuzzyTemperatura == 1 &&  fuzzyPrzyrost == 0) {
+        grzanie = true; 
+        czasGrzania = 30000UL;
+    }else if(fuzzyTemperatura == 2 &&  fuzzyPrzyrost == 0) {
+        grzanie = true; 
+        czasGrzania = 20000UL;
+    }else if(fuzzyTemperatura == 3 &&  fuzzyPrzyrost == 0) {
+        grzanie = false; 
+        czasGrzania = 15000UL;
+    }else if(fuzzyTemperatura == 4 &&  fuzzyPrzyrost == 0) {
+        grzanie = false; 
+        czasGrzania = 30000UL;
+    }else if(fuzzyTemperatura == 0 &&  fuzzyPrzyrost == 1) {
+        grzanie = true; 
+        czasGrzania = 30000UL;
+    }else if(fuzzyTemperatura == 1 &&  fuzzyPrzyrost == 1) {
+        grzanie = true; 
+        czasGrzania = 30000UL;
+    }else if(fuzzyTemperatura == 2 &&  fuzzyPrzyrost == 1) {
+        grzanie = false; 
+        czasGrzania = 15000UL;
+    }else if(fuzzyTemperatura == 3 &&  fuzzyPrzyrost == 1) {
+        grzanie = false; 
+        czasGrzania = 30000UL;
+    }else if(fuzzyTemperatura == 4 &&  fuzzyPrzyrost == 1) {
+        grzanie = false; 
+        czasGrzania = 40000UL;
+    }
+    Serial.println(String(((temperaturaUstawiona*1.0) - temperatura)) +" = "+ String(fuzzyTemperatura) +" -- "+ String(fuzzyPrzyrost)+" = "+ String(przyrost));
+    Serial.println("Ponowne: " + String(ponowneWprowadzenie) + "czas: " + String(aktualnyCzas));
+    if(aktualnyCzas > ponowneWprowadzenie) {
+        if(grzanie == true) {
+            digitalWrite(grzalka, LOW);
+            digitalWrite(grzalkaMata, LOW);
+            digitalWrite(grzalkaLED, HIGH);
+        }
+        else {
+            digitalWrite(grzalka, HIGH);
+            digitalWrite(grzalkaMata, HIGH);
+            digitalWrite(grzalkaLED, LOW);
+        }
+        ponowneWprowadzenie = aktualnyCzas + czasGrzania;
     }
 }
 
