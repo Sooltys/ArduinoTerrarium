@@ -189,7 +189,7 @@ void sterowanieTemperaturyRozmyte() {
     unsigned long czasGrzania = 0UL;
     if(fuzzyTemperatura == 0 &&  fuzzyPrzyrost == 0) {
         grzanie = true; 
-        czasGrzania = 30000UL;
+        czasGrzania = 40000UL;
     }else if(fuzzyTemperatura == 1 &&  fuzzyPrzyrost == 0) {
         grzanie = true; 
         czasGrzania = 30000UL;

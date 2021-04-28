@@ -60,10 +60,10 @@ float ostatniaTemperatura = 0.0;
 unsigned long ponowneWprowadzenie = 0.0;
 
 // zmienne sieci WiFi
-//char ssid[] = "FunBox2-EF66";       // SSID sieci WiFi
-//char pass[] = "NIEMAHASLA";         // haslo sieci WiFi
-char ssid[] = "iPhone (Jakub)"; // SSID sieci WiFi
-char pass[] = "qwerty123"; // haslo sieci WiFi
+char ssid[] = "FunBox2-EF66"; // SSID sieci WiFi
+char pass[] = "NIEMAHASLA"; // haslo sieci WiFi
+//char ssid[] = "iPhone (Jakub)";       // SSID sieci WiFi
+//char pass[] = "qwerty123";          // haslo sieci WiFi
 //int keyIndex = 0;                 // dla sieci zabezpieczonej WEP
 int status = WL_IDLE_STATUS;
 
@@ -204,7 +204,7 @@ void sterowanieTemperaturyRozmyte() {
     unsigned long czasGrzania = 0UL;
     if(fuzzyTemperatura == 0 && fuzzyPrzyrost == 0) {
         grzanie = true;
-        czasGrzania = 30000UL;
+        czasGrzania = 40000UL;
     }else if(fuzzyTemperatura == 1 && fuzzyPrzyrost == 0) {
         grzanie = true;
         czasGrzania = 30000UL;
