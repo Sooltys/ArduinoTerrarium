@@ -57,16 +57,16 @@ float ostatniaTemperatura = 0.0;
 unsigned long ponowneWprowadzenie = 0.0;
 
 // zmienne sieci WiFi
-char ssid[] = "FunBox2-EF66";       // SSID sieci WiFi
-char pass[] = "NIEMAHASLA";         // haslo sieci WiFi
-//char ssid[] = "iPhone (Jakub)";       // SSID sieci WiFi
-//char pass[] = "qwerty123";          // haslo sieci WiFi
+//char ssid[] = "FunBox2-EF66";       // SSID sieci WiFi
+//char pass[] = "NIEMAHASLA";         // haslo sieci WiFi
+char ssid[] = "iPhone (Jakub)";       // SSID sieci WiFi
+char pass[] = "qwerty123";          // haslo sieci WiFi
 //int keyIndex = 0;                 // dla sieci zabezpieczonej WEP
 int status = WL_IDLE_STATUS;
 
 // zmienne łączenia z serwerem
 WiFiClient client; 
-char SERVER[] = "www.pj41491.zut.edu.pl";
+char SERVER[] = "http://jakubp.pl/ArduinoProjectWebsite";
 int HTTP_PORT = 80;
 
 // inicjalizacja czujnika temperatury i wilgotności
@@ -127,7 +127,7 @@ void loop() {
 
     odczytajPrzyciskZmiany(); // obsługa przycisku zmiany wyświetlania
 
-    zmianaTemperaturyPrzyciski(); // obsługa przyciskó zmiany temperatury
+    zmianaTemperaturyPrzyciski(); // obsługa przycisku zmiany temperatury
   
     roznicaCzasu[nrCzasWysylanie] = aktualnyCzas - zapamietanyCzas[nrCzasWysylanie];
     if (roznicaCzasu[nrCzasWysylanie] >= czasWysylanieTemp) {

@@ -3,5 +3,5 @@
     "board": "arduino:avr:uno",
     "programmer": "AVRISP mkII",
     "output": "build",
-    "port": "COM5"
+    "port": "COM4"
 }

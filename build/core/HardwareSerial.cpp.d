@@ -1,4 +1,4 @@
-c:\Users\Kuba\Desktop\Praca\ dyplomowa\ArduinoTerrarium\build\core\HardwareSerial.cpp.o: \
+d:\ArduinoTerrarium\build\core\HardwareSerial.cpp.o: \
  C:\Users\Kuba\Desktop\arduino-1.8.10\hardware\arduino\avr\cores\arduino\HardwareSerial.cpp \
  C:\Users\Kuba\Desktop\arduino-1.8.10\hardware\arduino\avr\cores\arduino\Arduino.h \
  C:\Users\Kuba\Desktop\arduino-1.8.10\hardware\arduino\avr\cores\arduino\binary.h \

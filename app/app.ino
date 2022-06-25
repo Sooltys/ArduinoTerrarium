@@ -1,5 +1,3 @@
-#include <Arduino.h>
-#line 1 "d:\\ArduinoTerrarium\\app.ino"
 // biblioteka Arduino pozwalająca na komunikację z urządzeniami I2C na porcie SDA i SCL
 #include <Wire.h>
 // biblioteki do obsługi wyświetlacza LCD z konwerterem I2C
@@ -68,7 +66,7 @@ int status = WL_IDLE_STATUS;
 
 // zmienne łączenia z serwerem
 WiFiClient client; 
-char SERVER[] = "www.pj41491.zut.edu.pl";
+char SERVER[] = "http://jakubp.pl/ArduinoProjectWebsite";
 int HTTP_PORT = 80;
 
 // inicjalizacja czujnika temperatury i wilgotności
@@ -77,29 +75,6 @@ DHT dht(DHTPIN, DHTTYPE);
 // inicjalizacja wyświetlacza 
 LiquidCrystal_I2C lcd(0x27, 16, 2); 
 
-#line 78 "d:\\ArduinoTerrarium\\app.ino"
-void setup();
-#line 106 "d:\\ArduinoTerrarium\\app.ino"
-void loop();
-#line 147 "d:\\ArduinoTerrarium\\app.ino"
-void sterowanieTemperatury();
-#line 160 "d:\\ArduinoTerrarium\\app.ino"
-void sterowanieTemperaturyRozmyte();
-#line 238 "d:\\ArduinoTerrarium\\app.ino"
-void wyswietlDaneNaLCD();
-#line 283 "d:\\ArduinoTerrarium\\app.ino"
-void zmianaTemperaturyPrzyciski();
-#line 303 "d:\\ArduinoTerrarium\\app.ino"
-void odczytajPrzyciskZmiany();
-#line 324 "d:\\ArduinoTerrarium\\app.ino"
-void wyslijDaneNaSerwer();
-#line 349 "d:\\ArduinoTerrarium\\app.ino"
-int pobierzTemperature();
-#line 397 "d:\\ArduinoTerrarium\\app.ino"
-void printWifiStatus();
-#line 414 "d:\\ArduinoTerrarium\\app.ino"
-void connectWiFi();
-#line 78 "d:\\ArduinoTerrarium\\app.ino"
 void setup() {
     Serial.begin(9600); // szybkość komunikacji szeregowej
 
@@ -152,7 +127,7 @@ void loop() {
 
     odczytajPrzyciskZmiany(); // obsługa przycisku zmiany wyświetlania
 
-    zmianaTemperaturyPrzyciski(); // obsługa przyciskó zmiany temperatury
+    zmianaTemperaturyPrzyciski(); // obsługa przycisku zmiany temperatury
   
     roznicaCzasu[nrCzasWysylanie] = aktualnyCzas - zapamietanyCzas[nrCzasWysylanie];
     if (roznicaCzasu[nrCzasWysylanie] >= czasWysylanieTemp) {
@@ -479,5 +454,3 @@ void connectWiFi() {
     
     digitalWrite(komunikacjaLED, LOW);
 }
-#line 1 "d:\\ArduinoTerrarium\\test.ino"
-

@@ -1,4 +1,4 @@
-c:\Users\Kuba\Desktop\Praca\ dyplomowa\ArduinoTerrarium\build\core\wiring_digital.c.o: \
+d:\ArduinoTerrarium\build\core\wiring_digital.c.o: \
  C:\Users\Kuba\Desktop\arduino-1.8.10\hardware\arduino\avr\cores\arduino\wiring_digital.c \
  C:\Users\Kuba\Desktop\arduino-1.8.10\hardware\arduino\avr\cores\arduino\wiring_private.h \
  C:\Users\Kuba\Desktop\arduino-1.8.10\hardware\arduino\avr\cores\arduino\Arduino.h \

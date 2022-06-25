@@ -1,5 +1,5 @@
-c:\Users\Kuba\Desktop\Praca\ dyplomowa\ArduinoTerrarium\build\sketch\app.ino.cpp.o: \
- c:\Users\Kuba\Desktop\Praca\ dyplomowa\ArduinoTerrarium\build\sketch\app.ino.cpp \
+d:\ArduinoTerrarium\build\sketch\app.ino.cpp.o: \
+ d:\ArduinoTerrarium\build\sketch\app.ino.cpp \
  C:\Users\Kuba\Desktop\arduino-1.8.10\hardware\arduino\avr\cores\arduino/Arduino.h \
  C:\Users\Kuba\Desktop\arduino-1.8.10\hardware\arduino\avr\cores\arduino/binary.h \
  C:\Users\Kuba\Desktop\arduino-1.8.10\hardware\arduino\avr\cores\arduino/WCharacter.h \
